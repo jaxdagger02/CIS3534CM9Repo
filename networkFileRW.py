@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
-#networkFileRW.py
-#Pamela Brauda
-#Thursday, March 3, 2022
-#Update routers and switches;
-#read equipment from a file, write updates & errors to file
-
-##---->>>> Use a try/except clause to import the JSON module
+#GPA8.py
+#Jon Sutton
+#Friday, March 31, 2023
 
 
 
-##---->>>> Create file constants for the file names; file constants can be reused
-##         There are 2 files to read this program: equip_r.txt and equip_s.txt
-##         There are 2 files to write in this program: updated.txt and errors.txt
-      
+# importing the json module
+try:
+    import json
+
+except:
+    print("error")
+
+    
+#router and switch file constants
+routFile = "equip_r.txt"
+switFile = "equip_s.txt"
 
 
+# update and error file constants
+updaFile = "updated.txt"
+invaFile = "invalid.txt"
 
 
 #prompt constants
@@ -22,6 +28,7 @@ UPDATE = "\nWhich device would you like to update "
 QUIT = "(enter x to quit)? "
 NEW_IP = "What is the new IP address (111.111.111.111) "
 SORRY = "Sorry, that is not a valid IP address\n"
+
 
 #function to get valid device
 def getValidDevice(routers, switches):
@@ -37,6 +44,7 @@ def getValidDevice(routers, switches):
             return device  
         else:
             print("That device is not in the network inventory.")
+
 
 #function to get valid IP address
 def getValidIP(invalidIPCount, invalidIPAddresses):
@@ -56,28 +64,47 @@ def getValidIP(invalidIPCount, invalidIPAddresses):
             #validIP = True
                 return ipAddress, invalidIPCount
                 #don't need to return invalidIPAddresses list - it's an object
-        
+
+
+
 def main():
 
-    ##---->>>> open files here
+    #opens needed files
+    open(routFile)
+    open(switFile)
 
+    try:
+        open(updaFile, "w")
+    except:
+        open("updated.txt", "w")
+    #opens or creates files if necessary    
+    try:  
+        open(invaFile, "w")
+    except:
+        open("invalid.txt", "w")
 
 
     
     #dictionaries
-    ##---->>>> read the routers and addresses into the router dictionary
-
     routers = {}
 
+    #opens file to read > marks data to variable > converts data into dictionary
+    with open(routFile) as x:
+        data = x.read()
+    routers = json.loads(data)
 
-    ##---->>>> read the switches and addresses into the switches dictionary
 
     switches = {}
+    
+    #opens file to read > marks data to variable > converts data into dictionary
+    with open(switFile) as x:
+        data = x.read() 
+    switches = json.loads(data)
 
 
     #the updated dictionary holds the device name and new ip address
     updated = {}
-
+    
     #list of bad addresses entered by the user
     invalidIPAddresses = []
 
@@ -131,15 +158,18 @@ def main():
     print("Number of devices updated:", devicesUpdatedCount)
 
     ##---->>>> write the updated equipment dictionary to a file
-
+    with open(updaFile, "w") as x:
+        x.write(json.dumps(updated))
+        
     
     print("Updated equipment written to file 'updated.txt'")
     print()
     print("\nNumber of invalid addresses attempted:", invalidIPCount)
 
     ##---->>>> write the list of invalid addresses to a file
+    with open(invaFile, "w") as x:
+        x.write(json.dumps(invalidIPAddresses))
     
-
     print("List of invalid addresses written to file 'errors.txt'")
 
 #top-level scope check
